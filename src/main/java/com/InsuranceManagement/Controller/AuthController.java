@@ -62,19 +62,18 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ModelAndView login(@RequestParam String email,
+    public String login(@RequestParam String email,
                         @RequestParam String password,
-                        HttpSession session) {
-        ModelAndView modelAndView = new ModelAndView("login");
+                        HttpSession session,
+                        RedirectAttributes redirectAttributes) {
         Optional<UserResponseDto> userResponseDto = userService.authenticateUser(email, password);
         if (userResponseDto.isPresent()) {
-            modelAndView = new ModelAndView("redirect:/home");
-            modelAndView.addObject("user", userResponseDto.get());
+            redirectAttributes.addFlashAttribute("user", userResponseDto.get());
             session.setAttribute("user", userResponseDto);
-            return modelAndView;
+            return "redirect:/home";
         } else {
-            modelAndView.addObject("error", "Invalid email or password.");
-            return modelAndView;
+            redirectAttributes.addFlashAttribute("error", "Invalid email or password.");
+            return "redirect:/login";
         }
     }
 
