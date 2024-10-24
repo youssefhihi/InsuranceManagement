@@ -2,11 +2,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Home</title>
+    <title>Register - Insurance Co.</title>
 </head>
 <body>
-<h1>${message}</h1>
-    <p>This is a JSP view for the Insurance Management Application.</p>
+
 </body>
 </html>
 
