@@ -1,5 +1,6 @@
 package com.InsuranceManagement.dto.request;
 
+import com.InsuranceManagement.entity.User;
 import com.InsuranceManagement.enums.CarType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -11,5 +12,6 @@ public record InsuranceCarRequestDto(
         @NotNull @Size(min = 2, max = 100) String brand,
         @NotNull Boolean usage,
         @NotNull CarType carType,
-        @NotNull Boolean hadSinister
+        @NotNull Boolean hadSinister,
+         User user
 ) {}

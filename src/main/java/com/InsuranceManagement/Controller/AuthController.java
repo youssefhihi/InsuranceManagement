@@ -49,7 +49,7 @@ public class AuthController {
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/register";
+        return "redirect:/auth/register";
     }
 
 
@@ -69,7 +69,7 @@ public class AuthController {
         Optional<UserResponseDto> userResponseDto = userService.authenticateUser(email, password);
         if (userResponseDto.isPresent()) {
             redirectAttributes.addFlashAttribute("user", userResponseDto.get());
-            session.setAttribute("user", userResponseDto);
+            session.setAttribute("user", userResponseDto.get());
             return "redirect:/home";
         } else {
             redirectAttributes.addFlashAttribute("error", "Invalid email or password.");

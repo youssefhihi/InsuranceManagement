@@ -11,6 +11,5 @@ public record InsuranceCarResponseDto(
         String brand,
         Boolean usage,
         CarType carType,
-        Boolean hadSinister,
-        Double amount
+        Boolean hadSinister
 ) {}

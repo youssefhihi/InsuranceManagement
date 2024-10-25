@@ -2,6 +2,7 @@ package com.InsuranceManagement.entity;
 
 import jakarta.persistence.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -25,6 +26,9 @@ public class User {
 
     String address;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<InsuranceCar> insuranceCars;
+
     public User(String name, String email, String password, String phoneNumber, String address) {
         this.name = name;
         this.email = email;
@@ -34,6 +38,14 @@ public class User {
     }
 
     public User() {}
+
+    public List<InsuranceCar> getInsuranceCars() {
+        return insuranceCars;
+    }
+
+    public void setInsuranceCars(List<InsuranceCar> insuranceCars) {
+        this.insuranceCars = insuranceCars;
+    }
 
     public String getName() {
         return name;
