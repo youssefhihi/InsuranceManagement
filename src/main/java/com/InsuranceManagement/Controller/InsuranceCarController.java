@@ -1,20 +1,21 @@
 package com.InsuranceManagement.Controller;
 
 import com.InsuranceManagement.Service.Interfaces.InsuranceCarService;
-import com.InsuranceManagement.dto.request.ContractRequestDto;
 import com.InsuranceManagement.dto.request.InsuranceCarRequestDto;
 import com.InsuranceManagement.dto.response.InsuranceCarResponseDto;
+import com.InsuranceManagement.dto.response.UserResponseDto;
+import com.InsuranceManagement.entity.User;
 import com.InsuranceManagement.utils.CloudinaryService;
-import com.InsuranceManagement.utils.Helpers;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.List;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/auto-insurance")
@@ -29,50 +30,73 @@ public class InsuranceCarController {
     }
 
     @GetMapping
-    public ModelAndView home() {
-        return new ModelAndView("autoInsurance");
+    public ModelAndView autoInsurance(HttpSession session) {
+        UserResponseDto user = (UserResponseDto) session.getAttribute("user");
+        if (user == null) {
+            return new ModelAndView("redirect:/auth/register");
+        }
+        ModelAndView modelAndView = new ModelAndView("autoInsurance");
+        List<InsuranceCarResponseDto> insurancesCar = insuranceCarService.getInsuranceCarByUserId(user.id());
+        modelAndView.addObject("insurancesCar", insurancesCar);
+        return modelAndView;
+
     }
 
-    @RequestMapping(value = "/calculate-quotation", method = RequestMethod.POST)
-    public ModelAndView calculateInsuranceCarQuotation(@ModelAttribute InsuranceCarRequestDto requestDto,HttpSession session) {
+
+
+    @RequestMapping(value = "/create-autoInsurance", method = RequestMethod.POST)
+    public String createInsuranceCar(
+            @ModelAttribute InsuranceCarRequestDto requestDto,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+        UserResponseDto userAuth = (UserResponseDto) session.getAttribute("user");
+        if (userAuth == null) {
+            return "redirect:/auth/register";
+        }
         if (requestDto == null) {
-            return home();
+            return "redirect:/auto-insurance";
         }
-        InsuranceCarResponseDto responseDto = insuranceCarService.CalculateInsuranceCar(requestDto);
-
-        ModelAndView mav = new ModelAndView("autoInsurance");
-        session.setAttribute("insuranceCar",responseDto);
-        mav.addObject("insuranceCar", responseDto);
-        return mav;
-    }
-
-    @RequestMapping(value = "/accept-quotation", method = RequestMethod.POST)
-    public ModelAndView acceptInsuranceCar(@ModelAttribute ContractRequestDto contractRequestDto,HttpSession session) {
-
-        InsuranceCarResponseDto insurance = (InsuranceCarResponseDto) session.getAttribute("insuranceCar");
-        InsuranceCarRequestDto insuranceCarRequestDto = new InsuranceCarRequestDto(
-                insurance.driverAge(),
-                insurance.model(),
-                insurance.brand(),
-                insurance.usage(),
-                insurance.carType(),
-                insurance.hadSinister()
+        User user = new User();
+        user.setId(userAuth.id());
+        InsuranceCarRequestDto updatedRequestDto = new InsuranceCarRequestDto(
+                requestDto.driverAge(),
+                requestDto.model(),
+                requestDto.brand(),
+                requestDto.usage(),
+                requestDto.carType(),
+                requestDto.hadSinister(),
+                user
         );
-        InsuranceCarResponseDto insuranceResponseDto = insuranceCarService.createInsuranceCar(insuranceCarRequestDto);
+        try {
 
-        ContractRequestDto contract = new ContractRequestDto(
-                insuranceResponseDto.id(),
-                contractRequestDto.endDate(),
-                insurance.amount()
-        );
-
-    return home();
-    }
-
-    private String uploadFile(MultipartFile file) throws IOException {
-        try (InputStream inputStream = file.getInputStream()) {
-            byte[] fileBytes = inputStream.readAllBytes();
-            return cloudinaryService.uploadFile(fileBytes);
+        insuranceCarService.createInsuranceCar(updatedRequestDto);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
+        return "redirect:/auto-insurance";
     }
+
+    @RequestMapping(value = "/quotation", method = RequestMethod.GET)
+    public String calculateInsuranceCarQuotation(@RequestParam("insurance") UUID insuranceId ,HttpSession session, Model model) {
+        UserResponseDto userAuth = (UserResponseDto) session.getAttribute("user");
+        if (userAuth == null) {
+            return "redirect:/auth/register";
+        }
+        InsuranceCarResponseDto insuranceCar;
+        try {
+
+         insuranceCar = insuranceCarService.getInsuranceCarById(insuranceId);
+        } catch (Exception e) {
+            model.addAttribute("error", e.getMessage());
+            return "redirect:/auto-insurance";
+        }
+
+        double amount = insuranceCarService.CalculateInsuranceCar(insuranceCar);
+        model.addAttribute("amount", amount);
+        model.addAttribute("insuranceCar", insuranceCar);
+         return "quotation";
+    }
+
+
+
 }

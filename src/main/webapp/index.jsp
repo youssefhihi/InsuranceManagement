@@ -27,15 +27,15 @@
         <p class="mt-4 text-gray-600">We offer a range of services to meet all your insurance needs.</p>
 
         <div class="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            <a href="/auto-insurance" class="bg-gray-100 p-6 rounded-lg shadow-md">
+            <a href="${pageContext.request.contextPath}/auto-insurance" class="bg-gray-100 p-6 rounded-lg shadow-md">
                 <h3 class="text-2xl font-semibold text-blue-600">Auto Insurance</h3>
                 <p class="mt-4 text-gray-600">Get customized quotes based on your vehicle and driving history. Enjoy comprehensive coverage for your car.</p>
             </a>
-            <a href="/home-Insurance" class="bg-gray-100 p-6 rounded-lg shadow-md">
+            <a href="${pageContext.request.contextPath}/home-insurance" class="bg-gray-100 p-6 rounded-lg shadow-md">
                 <h3 class="text-2xl font-semibold text-blue-600">Home Insurance</h3>
                 <p class="mt-4 text-gray-600">Protect your home with our tailored policies, including coverage for natural disasters and theft.</p>
             </a>
-            <a href="car" class="bg-gray-100 p-6 rounded-lg shadow-md">
+            <a href="${pageContext.request.contextPath}/health-insurance" class="bg-gray-100 p-6 rounded-lg shadow-md">
                 <h3 class="text-2xl font-semibold text-blue-600">Health Insurance</h3>
                 <p class="mt-4 text-gray-600">Access affordable health plans and manage your policy online with ease.</p>
             </a>
