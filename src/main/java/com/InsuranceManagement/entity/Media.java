@@ -18,6 +18,12 @@ public class Media {
     @JoinColumn(name = "contract_id", nullable = false)
     private Contract contract;
 
+    public Media(String document, Contract contract) {
+        this.document = document;
+        this.contract = contract;
+    }
+    public Media() {}
+
     public UUID getId() {
         return id;
     }

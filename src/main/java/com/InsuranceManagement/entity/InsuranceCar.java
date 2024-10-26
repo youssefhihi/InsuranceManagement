@@ -16,6 +16,7 @@ public class InsuranceCar extends Insurance {
 
     Boolean hadSinister;
 
+    @Enumerated(EnumType.STRING)
     CarType carType;
 
     public CarType getCarType() {

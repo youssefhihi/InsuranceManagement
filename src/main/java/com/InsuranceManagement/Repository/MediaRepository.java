@@ -1,14 +1,11 @@
 package com.InsuranceManagement.Repository;
 
-import com.InsuranceManagement.entity.User;
+import com.InsuranceManagement.entity.Media;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, UUID> {
-    Optional<User> findByEmail(String email);
-
+public interface MediaRepository extends JpaRepository<Media, UUID> {
 }

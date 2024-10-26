@@ -2,6 +2,7 @@ package com.InsuranceManagement.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -28,6 +29,17 @@ public class Contract {
     @JoinColumn(name = "insurance_id", nullable = false)
     private Insurance insurance;
 
+    @OneToMany(mappedBy = "contract", cascade = CascadeType.ALL)
+    private List<Media> mediaList;
+
+
+    public List<Media> getMediaList() {
+        return mediaList;
+    }
+
+    public void setMediaList(List<Media> mediaList) {
+        this.mediaList = mediaList;
+    }
 
     public UUID getId() {
         return id;

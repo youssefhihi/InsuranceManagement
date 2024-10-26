@@ -17,16 +17,7 @@ public class Insurance {
     @JoinColumn(name = "user_id", nullable = false)
     public User user;
 
-    @OneToMany(mappedBy = "contract", cascade = CascadeType.ALL)
-    private List<Media> mediaList;
 
-    public List<Media> getMediaList() {
-        return mediaList;
-    }
-
-    public void setMediaList(List<Media> mediaList) {
-        this.mediaList = mediaList;
-    }
 
     public UUID getId() {
         return id;

@@ -1,27 +1,19 @@
 package com.InsuranceManagement.Controller;
 
 import com.InsuranceManagement.Service.Interfaces.InsuranceCarService;
-import com.InsuranceManagement.dto.request.ContractRequestDto;
 import com.InsuranceManagement.dto.request.InsuranceCarRequestDto;
 import com.InsuranceManagement.dto.response.InsuranceCarResponseDto;
 import com.InsuranceManagement.dto.response.UserResponseDto;
-import com.InsuranceManagement.entity.InsuranceCar;
 import com.InsuranceManagement.entity.User;
-import com.InsuranceManagement.exeption.NotFoundException;
-import com.InsuranceManagement.mapper.UserMapper;
 import com.InsuranceManagement.utils.CloudinaryService;
-import com.InsuranceManagement.utils.Helpers;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,7 +37,6 @@ public class InsuranceCarController {
         }
         ModelAndView modelAndView = new ModelAndView("autoInsurance");
         List<InsuranceCarResponseDto> insurancesCar = insuranceCarService.getInsuranceCarByUserId(user.id());
-        System.out.println("hiiiiiiiiiiiii" +insurancesCar);
         modelAndView.addObject("insurancesCar", insurancesCar);
         return modelAndView;
 
@@ -107,10 +98,5 @@ public class InsuranceCarController {
     }
 
 
-    private String uploadFile(MultipartFile file) throws IOException {
-        try (InputStream inputStream = file.getInputStream()) {
-            byte[] fileBytes = inputStream.readAllBytes();
-            return cloudinaryService.uploadFile(fileBytes);
-        }
-    }
+
 }

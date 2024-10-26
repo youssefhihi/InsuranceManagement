@@ -74,16 +74,7 @@ public class InsuranceCarServiceImpl implements InsuranceCarService {
     public List<InsuranceCarResponseDto> getInsuranceCarByUserId(UUID userId) {
 
         List<InsuranceCar> insuranceCars = insuranceCarRepository.findByUserId(userId);
-        insuranceCars.forEach(insuranceCar -> {
-            System.out.println("InsuranceCar ID: " + insuranceCar.getId());
-            System.out.println("Driver Age: " + insuranceCar.getDriverAge());
-            System.out.println("Model: " + insuranceCar.getModel());
-            System.out.println("Brand: " + insuranceCar.getBrand());
-            System.out.println("Car Type: " + insuranceCar.getCarType());
-            System.out.println("Usage: " + insuranceCar.getUsage());
-            System.out.println("Had Sinister: " + insuranceCar.getHadSinister());
-            System.out.println("User ID: " + insuranceCar.getUser().getId());
-        });
+
 
         return insuranceCars.stream().map(insuranceCarMapper::toDto).collect(Collectors.toList());
     }
