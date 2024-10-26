@@ -56,6 +56,26 @@
                 <span>${insuranceHealth.coverageType()}</span>
             </div>
         </c:if>
+        <c:if test="${not empty insuranceHome}">
+            <h2 class="text-xl font-bold mb-4">Home Insurance Details</h2>
+            <div class="flex justify-evenly">
+                <span class="font-semibold">Property Value (MAD):</span>
+                <span>${insuranceHome.propertyValue()}</span>
+            </div>
+            <div class="flex justify-evenly">
+                <span class="font-semibold">Property Type:</span>
+                <span>${insuranceHome.propertyType()}</span>
+            </div>
+            <div class="flex justify-evenly">
+                <span class="font-semibold">Risk Zone:</span>
+                <span>${insuranceHome.isRiskZone() ? 'Yes' : 'No'}</span>
+            </div>
+            <div class="flex justify-evenly">
+                <span class="font-semibold">Security System:</span>
+                <span>${insuranceHome.hasSecuritySystem() ? 'Yes' : 'No'}</span>
+            </div>
+        </c:if>
+
 
         <div class="flex justify-between text-lg mt-6">
             <span class="font-bold text-blue-600">Total Amount:</span>
