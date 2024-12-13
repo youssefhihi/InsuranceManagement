@@ -2,34 +2,45 @@ package com.InsuranceManagement.Controller;
 
 import com.InsuranceManagement.Service.Interfaces.UserService;
 import com.InsuranceManagement.dto.request.UserRequestDto;
-import com.InsuranceManagement.dto.response.UserResponseDto;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.Optional;
 
 @Controller
 @RequestMapping("/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final UserService userService;
-    @Autowired
-    public AuthController(UserService userService) {
-        this.userService = userService;
-    }
+    private final AuthenticationManager authenticationManager;
 
-
-    @RequestMapping(value = "/register")
+    @GetMapping("/register")
     public ModelAndView register(HttpSession session) {
-        if (session.getAttribute("user") != null) {
+        if (SecurityContextHolder.getContext().getAuthentication() != null &&
+                SecurityContextHolder.getContext().getAuthentication().isAuthenticated() &&
+                !"anonymousUser".equals(SecurityContextHolder.getContext().getAuthentication().getPrincipal())) {
             return new ModelAndView("redirect:/home");
         }
         return new ModelAndView("register");
+    }
+
+    @GetMapping("/login")
+    public ModelAndView showLoginForm() {
+        if (SecurityContextHolder.getContext().getAuthentication() != null &&
+                SecurityContextHolder.getContext().getAuthentication().isAuthenticated() &&
+                !"anonymousUser".equals(SecurityContextHolder.getContext().getAuthentication().getPrincipal())) {
+            return new ModelAndView("redirect:/home");
+        }
+        return new ModelAndView("login");
     }
 
     @PostMapping("/register")
@@ -43,7 +54,7 @@ public class AuthController {
         try {
             boolean isRegistered = userService.registerUser(userRequestDto);
             if (isRegistered) {
-                redirectAttributes.addFlashAttribute("success", "Your account has been successfully created. Please log in.");
+                redirectAttributes.addFlashAttribute("success", "Account successfully created. Please log in.");
                 return "redirect:/auth/login";
             }
         } catch (IllegalArgumentException e) {
@@ -53,34 +64,27 @@ public class AuthController {
     }
 
 
-    @GetMapping("/login")
-    public ModelAndView showLoginForm(HttpSession session) {
-        if (session.getAttribute("user") != null) {
-            return new ModelAndView("redirect:/home");
-        }
-        return new ModelAndView("login");
-    }
 
     @PostMapping("/login")
     public String login(@RequestParam String email,
                         @RequestParam String password,
-                        HttpSession session,
                         RedirectAttributes redirectAttributes) {
-        Optional<UserResponseDto> userResponseDto = userService.authenticateUser(email, password);
-        if (userResponseDto.isPresent()) {
-            redirectAttributes.addFlashAttribute("user", userResponseDto.get());
-            session.setAttribute("user", userResponseDto.get());
-            return "redirect:/home";
-        } else {
+        try {
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password);
+            Authentication authentication = authenticationManager.authenticate(authToken);
+             SecurityContextHolder.getContext().setAuthentication(authentication);
+            System.out.println("dddd" + authentication);
+            return "redirect:/";
+        } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Invalid email or password.");
-            return "redirect:/login";
+            return "redirect:/auth/login";
         }
     }
 
     @GetMapping("/logout")
-    public ModelAndView logout(HttpSession session) {
-        session.invalidate();
-        return new ModelAndView("redirect:/auth/login");
+    public String logout(HttpServletRequest request) {
+        request.getSession().invalidate();
+        SecurityContextHolder.clearContext();
+        return "redirect:/auth/login";
     }
-
 }

@@ -66,9 +66,10 @@ public class InsuranceHealthServiceImpl implements InsuranceHealthService {
     }
 
     @Override
-    public List<InsuranceHealthResponseDto> getInsuranceHealthByUserId(UUID userId) {
+    public List<InsuranceHealthResponseDto> getInsuranceHealthByUserId(String email) {
 
-        List<InsuranceHealth> insuranceHealths = insuranceHealthRepository.findByUserId(userId);
+        User user = userRepository.findByEmail(email).orElseThrow();
+        List<InsuranceHealth> insuranceHealths = insuranceHealthRepository.findByUserId(user.getId());
 
 
         return insuranceHealths.stream().map(insuranceHealthMapper::toDto).collect(Collectors.toList());

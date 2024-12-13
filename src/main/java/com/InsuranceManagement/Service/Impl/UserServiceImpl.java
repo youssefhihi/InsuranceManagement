@@ -5,6 +5,7 @@ import com.InsuranceManagement.Service.Interfaces.UserService;
 import com.InsuranceManagement.dto.request.UserRequestDto;
 import com.InsuranceManagement.dto.response.UserResponseDto;
 import com.InsuranceManagement.entity.User;
+import com.InsuranceManagement.enums.UserRole;
 import com.InsuranceManagement.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -35,13 +36,14 @@ public class UserServiceImpl implements UserService {
 
         String encodedPassword = passwordEncoder.encode(userRequestDto.password());
 
-        User user = new User(
-                userRequestDto.name(),
-                userRequestDto.email(),
-                encodedPassword,
-                userRequestDto.phoneNumber(),
-                userRequestDto.address()
-        );
+        User user = User.builder()
+                .name(userRequestDto.name())
+                .email(userRequestDto.email())
+                .phoneNumber(userRequestDto.phoneNumber())
+                .address(userRequestDto.address())
+                .password(encodedPassword)
+                .role(UserRole.ROLE_USER)
+                .build();
 
         User insertedUser = userRepository.save(user);
 

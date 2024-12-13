@@ -40,7 +40,13 @@ class UserServiceImplTest {
     void setUp() {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         userRequestDto = new UserRequestDto("John Doe", "john@example.com", "password123", "1234567890", "123 Street");
-        user = new User("John Doe", "john@example.com", passwordEncoder.encode("password123"), "1234567890", "123 Street");
+        user = User.builder()
+                        .address("address")
+                        .email("john@example.com")
+                                .password(passwordEncoder.encode("password123"))
+                                        .name("John Doe")
+                                                .phoneNumber("1234567890")
+                                                        .build();
         user.setId(UUID.randomUUID());
     }
 

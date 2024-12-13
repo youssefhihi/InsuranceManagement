@@ -12,9 +12,9 @@ public class DataSourceConfig {
     public DataSource getDataSource() {
         HikariDataSource dataSource = new HikariDataSource();
         dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setJdbcUrl("jdbc:postgresql://localhost:5432/InsuranceManagement");
+        dataSource.setJdbcUrl("jdbc:postgresql://localhost:5433/insuranceManagement");
         dataSource.setUsername("postgres");
-        dataSource.setPassword("password");
+        dataSource.setPassword("1234");
         return dataSource;
     }
 
