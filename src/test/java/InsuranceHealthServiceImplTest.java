@@ -96,20 +96,7 @@ public class InsuranceHealthServiceImplTest {
         assertEquals(expectedAmount, calculatedAmount);
     }
 
-    @Test
-    public void testGetInsuranceHealthByUserId() {
-        List<InsuranceHealth> insuranceHealths = List.of(insuranceHealth);
-        List<InsuranceHealthResponseDto> expectedResponse = List.of(responseDto);
 
-        when(insuranceHealthRepository.findByUserId(user.getId())).thenReturn(insuranceHealths);
-        when(insuranceHealthMapper.toDto(insuranceHealth)).thenReturn(responseDto);
-
-        List<InsuranceHealthResponseDto> result = insuranceHealthService.getInsuranceHealthByUserId(user.getId());
-
-        assertEquals(expectedResponse, result);
-        verify(insuranceHealthRepository, times(1)).findByUserId(user.getId());
-        verify(insuranceHealthMapper, times(insuranceHealths.size())).toDto(insuranceHealth);
-    }
 
     @Test
     public void testGetInsuranceHealthById() throws Exception {

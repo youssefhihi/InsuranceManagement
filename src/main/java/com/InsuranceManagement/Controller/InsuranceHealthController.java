@@ -8,6 +8,8 @@ import com.InsuranceManagement.entity.User;
 import com.InsuranceManagement.utils.CloudinaryService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,10 +18,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.UUID;
-
 @Controller
 @RequestMapping("/health-insurance")
 public class InsuranceHealthController {
+
     private final InsuranceHealthService insuranceHealthService;
 
     @Autowired
@@ -28,60 +30,68 @@ public class InsuranceHealthController {
     }
 
     @GetMapping
-    public ModelAndView healthInsurance(HttpSession session) {
-        UserResponseDto user = (UserResponseDto) session.getAttribute("user");
-        if (user == null) {
-            return new ModelAndView("redirect:/auth/register");
-        }
-        ModelAndView modelAndView = new ModelAndView("healthInsurance");
-        List<InsuranceHealthResponseDto> insurancesHealth = insuranceHealthService.getInsuranceHealthByUserId(user.id());
-        modelAndView.addObject("insurancesHealth", insurancesHealth);
-        return modelAndView;
+    public ModelAndView healthInsurance() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println(" health "+authentication.isAuthenticated());
+//        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+//            return new ModelAndView("redirect:/auth/login");
+//        }
 
+        String email = authentication.getName();
+
+        ModelAndView modelAndView = new ModelAndView("healthInsurance");
+        List<InsuranceHealthResponseDto> insurancesHealth = insuranceHealthService.getInsuranceHealthByUserId(email);
+        modelAndView.addObject("insurancesHealth", insurancesHealth);
+
+        return modelAndView;
     }
 
+    @PostMapping("/create-healthInsurance")
+    public String createInsuranceHealth(@ModelAttribute InsuranceHealthRequestDto requestDto, RedirectAttributes redirectAttributes) {
+        // Get the authenticated user from Spring Security's context
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // If the user is not authenticated, redirect to the login page
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            return "redirect:/auth/login";
+        }
 
-
-        @RequestMapping(value = "/create-healthInsurance", method = RequestMethod.POST)
-        public String createInsuranceHealth(
-                @ModelAttribute InsuranceHealthRequestDto requestDto,
-                HttpSession session,
-                RedirectAttributes redirectAttributes) {
-            UserResponseDto userAuth = (UserResponseDto) session.getAttribute("user");
-            if (userAuth == null) {
-                return "redirect:/auth/register";
-            }
-            if (requestDto == null) {
-                return "redirect:/health-insurance";
-            }
-            User user = new User();
-            user.setId(userAuth.id());
-
-            InsuranceHealthRequestDto updatedRequestDto = new InsuranceHealthRequestDto(
-                    requestDto.age(),
-                    requestDto.healthStatus(),
-                    requestDto.coverageType(),
-                    user
-            );
-            System.out.println(updatedRequestDto);
-            try {
-
-                insuranceHealthService.createInsuranceHealth(updatedRequestDto);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+        if (requestDto == null) {
             return "redirect:/health-insurance";
         }
 
-    @RequestMapping(value = "/quotation", method = RequestMethod.GET)
-    public String calculateInsuranceHealthQuotation(@RequestParam("insurance") UUID insuranceId , HttpSession session, Model model) {
-        UserResponseDto userAuth = (UserResponseDto) session.getAttribute("user");
-        if (userAuth == null) {
-            return "redirect:/auth/register";
+        // Get the authenticated user (could use the username to fetch user info)
+        String username = authentication.getName();
+        User user = new User();
+        user.setEmail(username); // Assuming you use username for user identification
+
+        InsuranceHealthRequestDto updatedRequestDto = new InsuranceHealthRequestDto(
+                requestDto.age(),
+                requestDto.healthStatus(),
+                requestDto.coverageType(),
+                user
+        );
+
+        try {
+            insuranceHealthService.createInsuranceHealth(updatedRequestDto);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
+
+        return "redirect:/health-insurance";
+    }
+
+    @GetMapping("/quotation")
+    public String calculateInsuranceHealthQuotation(@RequestParam("insurance") UUID insuranceId, Model model) {
+        // Get the authenticated user from Spring Security's context
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // If the user is not authenticated, redirect to the login page
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            return "redirect:/auth/login";
+        }
+
         InsuranceHealthResponseDto insuranceHealth;
         try {
-
             insuranceHealth = insuranceHealthService.getInsuranceHealthById(insuranceId);
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
@@ -91,7 +101,7 @@ public class InsuranceHealthController {
         double amount = insuranceHealthService.CalculateInsuranceHealth(insuranceHealth);
         model.addAttribute("amount", amount);
         model.addAttribute("insuranceHealth", insuranceHealth);
+
         return "quotation";
     }
-
 }

@@ -9,6 +9,6 @@ import java.util.UUID;
 public interface InsuranceHealthService {
     InsuranceHealthResponseDto createInsuranceHealth(InsuranceHealthRequestDto requestDto) throws Exception;
     Double CalculateInsuranceHealth(InsuranceHealthResponseDto requestDto);
-    List<InsuranceHealthResponseDto> getInsuranceHealthByUserId(UUID userId);
+    List<InsuranceHealthResponseDto> getInsuranceHealthByUserId(String email);
     InsuranceHealthResponseDto getInsuranceHealthById(UUID carId) throws Exception;
 }
